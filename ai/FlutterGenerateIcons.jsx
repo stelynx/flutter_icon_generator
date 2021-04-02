@@ -1,3 +1,5 @@
+var IS_FLUTTER = true;
+
 var selectedAppIconArtboards = {};
 var selectedAppIconPlatforms = {};
 
@@ -95,16 +97,142 @@ var appIconsMacOS = [
   },
 ];
 
+var appIconsAndroid = [
+  {
+    name: 'mipmap-hdpi/ic_launcher.png',
+    size: 72,
+  },
+  {
+    name: 'mipmap-mdpi/ic_launcher.png',
+    size: 48,
+  },
+  {
+    name: 'mipmap-xhdpi/ic_launcher.png',
+    size: 96,
+  },
+  {
+    name: 'mipmap-xxhdpi/ic_launcher.png',
+    size: 144,
+  },
+  {
+    name: 'mipmap-xxxhdpi/ic_launcher.png',
+    size: 192,
+  },
+];
+
+var appIconsWeb = [
+  {
+    name: 'favicon.png',
+    size: 16,
+  },
+  {
+    name: 'icons/Icon-192.png',
+    size: 192,
+  },
+  {
+    name: 'icons/Icon-512.png',
+    size: 512,
+  },
+];
+
+var appIconsWindows = [
+  {
+    name: 'app_icon_16.png',
+    size: 16,
+  },
+  {
+    name: 'app_icon_32.png',
+    size: 32,
+  },
+  {
+    name: 'app_icon_48.png',
+    size: 48,
+  },
+  {
+    name: 'app_icon_256.png',
+    size: 256,
+  },
+];
+
+var appIconsWindowsExtended = [
+  {
+    name: 'app_icon_16.png',
+    size: 16,
+  },
+  {
+    name: 'app_icon_32.png',
+    size: 32,
+  },
+  {
+    name: 'app_icon_48.png',
+    size: 48,
+  },
+  {
+    name: 'app_icon_256.png',
+    size: 256,
+  },
+  {
+    name: 'app_icon_24.png',
+    size: 24,
+  },
+  {
+    name: 'app_icon_64.png',
+    size: 64,
+  },
+  {
+    name: 'app_icon_72.png',
+    size: 72,
+  },
+  {
+    name: 'app_icon_96.png',
+    size: 96,
+  },
+  {
+    name: 'app_icon_128.png',
+    size: 128,
+  },
+  {
+    name: 'app_icon_180.png',
+    size: 180,
+  },
+];
+
 var availablePlatforms = [
   {
     name: 'iOS',
-    path: '/ios/Runner/Assets.xcassets/AppIcon.appiconset/',
+    path: '/AppIcon.appiconset/',
+    pathFlutter: '/ios/Runner/Assets.xcassets/AppIcon.appiconset/',
     appIcons: appIconsIOS,
   },
   {
     name: 'macOS',
-    path: '/macos/Runner/Assets.xcassets/AppIcon.appiconset/',
+    path: '/AppIcon.appiconset/',
+    pathFlutter: '/macos/Runner/Assets.xcassets/AppIcon.appiconset/',
     appIcons: appIconsMacOS,
+  },
+  {
+    name: 'Android',
+    path: '/app/src/main/res/',
+    pathFlutter: '/android/app/src/main/res/',
+    appIcons: appIconsAndroid,
+  },
+  {
+    name: 'Web',
+    path: '/',
+    pathFlutter: '/web',
+    appIcons: appIconsWeb,
+  },
+  {
+    name: 'Windows',
+    path: '/',
+    pathFlutter: '/windows/runner/resources/',
+    appIcons: appIconsWindows,
+  },
+  {
+    name: 'Windows (Extended)',
+    path: '/',
+    pathFlutter: '/windows/runner/resources',
+    appIcons: appIconsWindowsExtended,
   },
 ];
 
@@ -119,8 +247,12 @@ if (document && folder) {
   var platformGroup = dialog.add('group');
   platformGroup.alignChildren = 'top';
 
+  var frameworkGroup = dialog.add('group');
+  frameworkGroup.alignChildren = 'top';
+
   createArtboardSelectionPanel('Select artboards to export as icons', selectedAppIconArtboards, appIconGroup);
   createPlatformSelectionPanel('Select platforms to generate icons for', selectedAppIconPlatforms, platformGroup);
+  createFrameworkSelectionPanel('Select framework', frameworkGroup);
 
   var buttonGroup = dialog.add('group');
   var okButton = buttonGroup.add('button', undefined, 'Export');
@@ -149,7 +281,7 @@ function exportAppIcons(win) {
 
     for (var platformName in selectedAppIconPlatforms) {
       var platform = selectedAppIconPlatforms[platformName];
-      var expFolder = new Folder(folder.fsName + platform.path);
+      var expFolder = new Folder(folder.fsName + (IS_FLUTTER ? platform.pathFlutter : platform.path));
       if (!expFolder.exists) {
         alert('Folder "' + folder.fsName + platform.path + '" does not exist, exiting');
         win.close();
@@ -227,6 +359,17 @@ function createPlatformSelectionPanel(name, selected, parent) {
         delete selected[this.item.name];
       }
     };
-    //selected[availablePlatforms[i].name] = availablePlatforms[i];
   }
+}
+
+function createFrameworkSelectionPanel(name, parent) {
+  var panel = parent.add('panel', undefined, name);
+  panel.alignChildren = 'left';
+  panel.minimumSize.width = 400;
+  var cb = panel.add('checkbox', undefined, '\u00A0' + 'Flutter');
+  cb.item = IS_FLUTTER;
+  cb.value = IS_FLUTTER;
+  cb.onClick = function () {
+    IS_FLUTTER = this.value;
+  };
 }
